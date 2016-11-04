@@ -1,15 +1,17 @@
-![logo](logo-image)
-
-
 # RethinkDB-CMS
+
+Providing a bare-bones admin for a generic JSON datastore, and a livefeed of that datastore  for consumption by client apps.     
+
+<img src="https://raw.githubusercontent.com/krisrandall/rethinkdb-cms/master/logo.png" width="180">
+
+
 
 ## Work in progress ...
 
 
   [![NPM Version][npm-image]][npm-url]
   [![Build Status](https://api.travis-ci.org/http-auth/http-auth.png)](https://travis-ci.org/rethinkdb-cms/rethinkdb-cms)
-  
-Providing a bare-bones admin for a generic datastore, and a livefeed of that datastore  for consumption by client apps.      
+   
    
 
 ```js
@@ -74,5 +76,5 @@ This is my first attempt at an NPM module, or having built in tests, or a few ot
 
 [npm-image]: https://img.shields.io/npm/v/rethinkdb-cms.svg
 [npm-url]: https://npmjs.org/package/rethinkdb-cms
-[logo-image]: ./icon.png
 
+ 
