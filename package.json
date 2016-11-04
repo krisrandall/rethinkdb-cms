@@ -13,6 +13,10 @@
   "devDependencies": {
     "mocha": "^3.1.2"
   },
+  "repository" : { 
+    "type" : "git", 
+    "url" : "https://github.com/krisrandall/rethinkdb-cms.git"
+  },
   "scripts": {
     "test": "mocha"
   }
