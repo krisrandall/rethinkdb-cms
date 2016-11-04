@@ -9,8 +9,8 @@ Providing a bare-bones admin for a generic JSON datastore, and a livefeed of tha
 ## Work in progress ...
 
 
-  [![NPM Version][npm-image]][npm-url]
-  [![Build Status](https://api.travis-ci.org/http-auth/http-auth.png)](https://travis-ci.org/rethinkdb-cms/rethinkdb-cms)
+  ![](https://img.shields.io/badge/rating-awesome-blue.svg)
+  
    
    
 
@@ -73,8 +73,3 @@ RethinDB-CMS uses [RethinkDB](https://www.rethinkdb.com/) and [socket.io](http:/
 
 This is my first attempt at an NPM module, or having built in tests, or a few other things -- I welcome other contributers (that will also be a first) to join in with this project, especially anywhere I've not followed best practice.
 
-
-[npm-image]: https://img.shields.io/npm/v/rethinkdb-cms.svg
-[npm-url]: https://npmjs.org/package/rethinkdb-cms
-
- 
