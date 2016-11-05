@@ -2,9 +2,8 @@
 
 
 
-**Phase 2:** Providing a bare-bones admin for a generic JSON datastore.  
-**Phase 1:** A livefeed of any changes to that datastore for consumption by client apps.     
-
+**Phase 1:** A livefeed of any changes to a rethinkdb datastore for consumption by client apps.    
+**Phase 2:** Providing a bare-bones (but extensible) admin for that generic JSON datastore.      
 
 
 <img src="https://raw.githubusercontent.com/krisrandall/rethinkdb-cms/master/logo.png" width="180">
@@ -18,7 +17,7 @@ RethinkDB-CMS uses [RethinkDB](https://www.rethinkdb.com/) and [socket.io](http:
   
 Admin of the RethinkDB is to be done via another mechanism, and this version of rethinkdb-cms offers a live socket feed everytime something updates.
 
-#### I am using [chateau](https://github.com/neumino/chateau) as the CMS
+**I am using [chateau](https://github.com/neumino/chateau) as the CMS**
 
 Here is a sample usage of configuring a rethinkdb-cms live feed:
 
@@ -44,12 +43,8 @@ Develop the CMS ... this part of the project I do not see myself getting to in t
 If you would love to donate to this project, I would love that, and it would mean I am able to do this Phase 2 part, which is the namesake of this npm module.
 
 
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="VWDMDYA4GSB9N">
-<input type="image" src="https://www.paypalobjects.com/en_AU/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_AU/i/scr/pixel.gif" width="1" height="1">
-</form>
+**[Make a donation via PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=EBCA9GCD7W3YJ)**
+
 
 
 
