@@ -15,42 +15,32 @@ Providing a bare-bones admin for a generic JSON datastore, and a livefeed of tha
    
 
 ```js
-var rdbcms = require('rethinkdb-cms')
+var rdbcms = require('rethinkdb-cms');
 var auth   = require('http-auth');
 
-var config = {
-	apps: [
-		{
-			id:	    "Demo App",
-			name:   "Show what the new rethinkdb-cms is capable of",
-			secret: "My App Password",
-			datasets: [ "Notices", "Info", "Street Locations" ]
-		} 
-	],
-	admin : {
-		port: 4000,
-		auth: {
-		    realm: "Secure Area.",
-		    file: __dirname + "/../data/users.htpasswd"
-		},
-		access: {
-			"demouser": [ "Demo App" ] 
-		}
-	},
-	livefeed : {
-		port:   5000,
-	}
+var dataset_schema: {
+			apps:{
+				'demoapp': {
+					collection_name: 	'demo_app',
+					secret:   			'secret',
+					datasets: 			[ 'dataset1', 'dataset2' ] 
+				}
 }
 
-var cms = rdbcms(config.apps);
+var cms = rdbcms(dataset_schema).then( function() {
+	
+	cms.admin();
 
-cms.admin(config.admin);
+	cms.livefeed();
 
-cms.livefeed(config.livefeed);
+});
 
+	
 
 ```
-Note that to make this example work you will need to create the `../data/user.htpasswd` file ([generate a user.htpasswd file here](http://www.htaccesstools.com/htpasswd-generator/)) and add the "demouser" to that file.
+Note that to make this example work you will need to create the `../data/user.htpasswd` file and add the "demouser" to that file.      
+See [here](http://www.htaccesstools.com/htpasswd-generator/) to generate a user.htpasswd file.    
+See [here](https://www.rethinkdb.com/api/javascript/) for rethinkdb configuration options (but note the `db` name will have the app id prefix added to it).
 
 
 ## Installation
@@ -59,13 +49,17 @@ Note that to make this example work you will need to create the `../data/user.ht
 $ npm install rethinkdb-cms --save
 ```
 
-     
+    
+## Options
+
+
+
      
 ## About
 
 All updates to the datastore are done via admin, the CMS does not support updates from client apps, and all data is sent to all app clients, there is no filtering of the data.  If these 2 restrictions do not fit your needs then you will either need to find another solution, or contribute to this repo to extend it.
 
-RethinDB-CMS uses [RethinkDB](https://www.rethinkdb.com/) and [socket.io](http://socket.io/). 
+RethinkDB-CMS uses [RethinkDB](https://www.rethinkdb.com/) and [socket.io](http://socket.io/). 
 
 ---
 ---
