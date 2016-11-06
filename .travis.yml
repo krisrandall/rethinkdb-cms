@@ -1,9 +1,8 @@
 language: node_js
 node_js:
-  - "6.2.x"
+  - "6.2.1"
 branches:
   only:
     - master
 before_script:
   - npm install
-  
