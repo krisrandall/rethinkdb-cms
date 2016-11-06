@@ -44,8 +44,6 @@ function validateState(passed_config) {
 	}
 	if( Object.prototype.toString.call( cols ) !== '[object Array]' ) throw("Collections is not an array, it must be an array of strings which are collections in your rethinkDb");
 
-	if (app==null) 	app = ""; // app is not required
-
 	if (!passed_config.port) throw("Invalid config passed, you must pass a port number if you are passing in config");
 
 }
