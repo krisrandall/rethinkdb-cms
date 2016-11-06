@@ -80,15 +80,18 @@ Cms.prototype.activateFeed = function (livefeed_config, callback_to_client) {
 				else socket.emit(cfg.topic, { ok: false, message: "Invalid App Id" });
 				return;
 			}
+
+			if (app.secret) {
+				var cryptr = new Cryptr(app.secret);
+			}
+
 		}
 		var from = null;
 		if (socket.handshake.query.updatedDts) {
 			from = new Date(socket.handshake.query.updatedDts);			
 		}
 
-		if (app.secret) {
-			var cryptr = new Cryptr(app.secret);
-		}
+	
 
 
 		// TODO : need to verify that the connection request has come from the correct app Id (mechanism to be decided, but would use secret)
@@ -120,7 +123,7 @@ Cms.prototype.activateFeed = function (livefeed_config, callback_to_client) {
 
 	                    	item.table = cols[i];
 	                    	item.ok	   = true;	
-	                        let encodedData = ( (app.secret) ? crypt.encode(item) : item )
+	                        let encodedData = ( (app && app.secret) ? crypt.encode(item) : item )
 	                        socket.emit(cfg.topic, item);
 
 	                        
