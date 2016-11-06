@@ -23,8 +23,7 @@ npm install rethinkdb-cms --save
 ## Phase 1
 
   ![](https://img.shields.io/badge/status-work_in_progress-yellow.svg)
-  ![](https://api.travis-ci.org/krisrandall/rethinkdb-cms.svg?branch=master)
-  
+
   
 Admin of the RethinkDB is to be done via another mechanism.   
 **I am using [chateau](https://github.com/neumino/chateau) as the CMS.**
