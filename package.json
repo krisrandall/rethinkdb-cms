@@ -1,6 +1,6 @@
 {
   "name": "rethinkdb-cms",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A live socket feed of all updates from a rethinkdb datastore",
   "main": "index.js",
   "author": "krisrandall",

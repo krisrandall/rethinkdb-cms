@@ -22,7 +22,7 @@ npm install rethinkdb-cms --save
 
 ## Phase 1
 
-  ![](https://img.shields.io/badge/status-work_in_progress-yellow.svg)
+  ![](https://img.shields.io/badge/status-complete-green.svg)
 
   
 Admin of the RethinkDB is to be done via another mechanism.   
@@ -32,21 +32,23 @@ Admin of the RethinkDB is to be done via another mechanism.
 This version of rethinkdb-cms offers a live socket feed every time something updates.
 
 
-Here is a sample usage of configuring a rethinkdb-cms live feed:
+Here is a sample usage of configuring a rethinkdb-cms live feed server:
 
 ```javascript
 var Cms    = require('rethinkdb-cms');
 var rdbcms = new Cms();
 var r      = require('rethinkdb');
 
-r.connect({ db: 'my_rethinkdb' }).then(function(rdb) {
+r.connect({ db: 'my_rethinkdb' }).then(function(conn) {
 
-	rdbcms.setDb(rdb);
-	rdbcms.setCollections([ 'news', 'notices', 'map_locations']);
+	rdbcms.setDb(conn);
+	rdbcms.setCollections([ 'news', 'notices' ]); 
 	
 	rdbcms.activateFeed({ port: 4000 });
 	
-	rdb.table('news').insert({ 'content': 'Here is some NEW news!', 'updatedDts' : new Date() });
+	r.table('news')
+	.insert({ 'content': 'Here is some NEW news!', 'updatedDts' : new Date() })
+	.run(conn);;
 
 	// rdbcms.stopFeed();
 	
@@ -70,7 +72,9 @@ socket.on('update', function (data) {
 </script>
 ```
 
+### Working Demo
 
+**[https://github.com/krisrandall/rethinkdb-cms-demo](https://github.com/krisrandall/rethinkdb-cms-demo)**
 
 ## Phase 2
 
