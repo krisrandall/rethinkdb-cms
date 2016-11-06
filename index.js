@@ -44,6 +44,8 @@ function validateState(passed_config) {
 	}
 	if( Object.prototype.toString.call( cols ) !== '[object Array]' ) throw("Collections is not an array, it must be an array of strings which are collections in your rethinkDb");
 
+	if (app==null) app = '';
+
 	if (!passed_config.port) throw("Invalid config passed, you must pass a port number if you are passing in config");
 
 }
@@ -73,7 +75,7 @@ Cms.prototype.activateFeed = function (livefeed_config, callback_to_client) {
 	io.sockets.on('connection', function(socket) {
 
 		// check params
-		if (app!=null) {
+		if (app!='') {
 			if (socket.handshake.query.appid!=app) {
 				// send error socket message back
 				if (typeof(callback_to_client)!='undefined') callback_to_client({ ok: false, message: "Invalid App Id" });
@@ -121,7 +123,7 @@ Cms.prototype.activateFeed = function (livefeed_config, callback_to_client) {
 
 	                    	// emit the data back to the client (encode it if there is an app.secret set)
 
-	                    	item.table = cols[i];
+	                    	item.table = table;
 	                    	item.ok	   = true;	
 	                        let encodedData = ( (app && app.secret) ? crypt.encode(item) : item )
 	                        socket.emit(cfg.topic, item);
