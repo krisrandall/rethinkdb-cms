@@ -11,6 +11,13 @@
 
 RethinkDB-CMS uses [RethinkDB](https://www.rethinkdb.com/) and [socket.io](http://socket.io/). 
 
+## Install
+
+```
+npm install rethinkdb-cms --save
+```
+
+
 ## Phase 1
 
   ![](https://img.shields.io/badge/status-work_in_progress-yellow.svg)
