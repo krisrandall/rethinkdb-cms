@@ -22,20 +22,49 @@ npm install rethinkdb-cms --save
 
   ![](https://img.shields.io/badge/status-work_in_progress-yellow.svg)
   
-Admin of the RethinkDB is to be done via another mechanism, and this version of rethinkdb-cms offers a live socket feed everytime something updates.
+Admin of the RethinkDB is to be done via another mechanism.   
+**I am using [chateau](https://github.com/neumino/chateau) as the CMS.**
 
-**I am using [chateau](https://github.com/neumino/chateau) as the CMS**
+
+This version of rethinkdb-cms offers a live socket feed every time something updates.
+
 
 Here is a sample usage of configuring a rethinkdb-cms live feed:
 
-```
-to do ...
+```javascript
+var Cms    = require('rethinkdb-cms');
+var rdbcms = new Cms();
+var r      = require('rethinkdb');
+
+r.connect({ db: 'my_rethinkdb' }).then(function(rdb) {
+
+	rdbcms.setDb(rdb);
+	rdbcms.setCollections([ 'news', 'notices', 'map_locations']);
+	
+	rdbcms.activateFeed({ port: 4000 });
+	
+	rdb.table('news').insert({ 'content': 'Here is some NEW news!', 'updatedDts' : new Date() });
+
+	// rdbcms.stopFeed();
+	
+});
+
+
 ```
 
-And here is the code for a sample client app to consume that:
+And here is the HTML for a sample client app to consume that:
 
-```
-also to do ...
+```html
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script>
+var socket = io.connect('http://localhost:4000');
+socket.on('update', function (data) {
+	console.log('I just received an update to the collection',
+				  data.table, 
+				  ', here is the new data:', 
+				  data.new_val);
+});
+</script>
 ```
 
 

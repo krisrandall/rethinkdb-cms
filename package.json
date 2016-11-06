@@ -6,13 +6,24 @@
   "author": "krisrandall",
   "license": "ISC",
   "dependencies": {
+    "cryptr": "^2.0.0",
+    "express": "^4.14.0",
     "http-auth": "^3.0.1",
+    "json-override": "^0.2.0",
     "passport": "^0.3.2",
-    "passport-http": "^0.3.0"
+    "passport-http": "^0.3.0",
+    "rethinkdb": "^2.3.3",
+    "socket.io": "^1.5.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/krisrandall/rethinkdb-cms.git"
+  },
+  "scripts": {
+    "test": "mocha"
   }
 }

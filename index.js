@@ -4,62 +4,70 @@ var override = require('json-override');
 var sanatize = function(txt) { return txt.replace(/[^0-9a-zA-Z]/g, ''); };
 var defaults = require('./default-config.js');
 var Cryptr 	 = require('cryptr')
+var express  = require('express');
+var sockio	 = require('socket.io');
 
 
-/*
+var db 	    = null;
+var app 	= null;
+var cols  	= null;
 
-There is only one database,
-Each "app" is created as a Colleciton with the name (prefix)+(app id)
-Each document has a dataset feild added to it
+var changeCursors = {};
 
-*/
+var io;
 
-var db 	   = null;
-var schema = null;
+function Cms() {};
 
 
-// database_config includes both an "apps" object which shows all the datasets and secrets 
-// per app, and (optionally) rethinkdb config, also a prefix, which is the 
-var cms = function (database_config) {
+Cms.prototype.setDb = function (db_handle) {
+	db = db_handle;
+}
 
-	var cfg = override(defaults.DATABASE, database_config, true);
+Cms.prototype.setApp = function (app_prefix) {
+	app = app_prefix;	
+}
 
-	schema = database_config;
+Cms.prototype.setCollections = function (collections) {
+	cols = collections;
+}
 
-	return new Promise(resolve, reject) {
 
-		// start the database
-		r.connect( cfg.rethinkdb ).then( function(err, db_handle) {
+function validateState(passed_config) {
 
-			if (err) reject(err);
-			else {
-				db = db_handle;
-				resolve();
-			}
+	if (db==null) 	throw("Database is null, setDb() must be called with a valid active rethinkDb");
+	if (typeof(db)=='string') throw("setDb() has been set to a string, it should be set to a rethinkDb handle");
 
-		});
-	
+	if (cols==null) throw("Collections is null, setCollections() must be called");
+	// if cols is a string then convert it to an array of just one item
+	if( typeof cols === 'string' ) {
+	    cols = [ cols ];
 	}
+	if( Object.prototype.toString.call( cols ) !== '[object Array]' ) throw("Collections is not an array, it must be an array of strings which are collections in your rethinkDb");
+
+	if (app==null) 	app = ""; // app is not required
+
+	if (!passed_config.port) throw("Invalid config passed, you must pass a port number if you are passing in config");
 
 }
 
 
-cms.prototype.admin = function (admin_config) {
+function activateServer(config) {
 
-	if (db==null) throw("Database is null, this must be called after cms has resolved");
-
+	var app = express();
+	io = sockio.listen(app.listen(config.port));
 
 }
 
+Cms.prototype.activateFeed = function (livefeed_config, callback_to_client) {
 
-
-cms.prototype.livefeed = function (livefeed_config, callback_to_client) {
-
-	if (db==null) throw("Database is null, this must be called after cms has resolved");
+	if (typeof(livefeed_config)=='undefined') livefeed_config = {};
 
 	var cfg = override(defaults.LIVEFEED, livefeed_config, true);
 
-	var changeCursors = {};
+	validateState(cfg);
+
+	activateServer(cfg);
+
 
 	// listen for socket connections
 	// the connection must include an app id, and can include a updatedDts: io.connect({query:"appid=xxx&updatedDts=parsabledate"});
@@ -67,34 +75,38 @@ cms.prototype.livefeed = function (livefeed_config, callback_to_client) {
 	io.sockets.on('connection', function(socket) {
 
 		// check params
-		if (!access.checkValidApp(socket.handshake.query.appid)) {
-			// send error socket message back
-			if (typeof(callback_to_client)!='undefined') callback_to_client({ ok: false, message: "Invalid App Id" });
-			else socket.emit(cfg.topic, { ok: false, message: "Invalid App Id" });
-			return;
+		if (app!=null) {
+			if (socket.handshake.query.appid!=app) {
+				// send error socket message back
+				if (typeof(callback_to_client)!='undefined') callback_to_client({ ok: false, message: "Invalid App Id" });
+				else socket.emit(cfg.topic, { ok: false, message: "Invalid App Id" });
+				return;
+			}
 		}
 		var from = null;
 		if (socket.handshake.query.updatedDts) {
 			from = new Date(socket.handshake.query.updatedDts);			
 		}
 
-		let app = cfg.apps[socket.handshake.query.appid];
+		if (app.secret) {
+			var cryptr = new Cryptr(app.secret);
+		}
 
-		var cryptr = new Cryptr(app.secret);
-		
+
 		// TODO : need to verify that the connection request has come from the correct app Id (mechanism to be decided, but would use secret)
 
-		let cursor_id = socket.id;
+		// for each collection
+		for (var i=0; i<cols.length; i++) {
 
-		
-	    r.table(table)
-	    .filter( r.row("updatedDts").gt(from) )
-	    .changes({ includeInitial: true })
-	    .run(db_connection, function(err, cursor) {
+			let cursor_id = socket.id+'_'+cols[i];
+			let table     = app + cols[i];
 
-	        if (err) {
-	            throw(err);
-	        } else {
+
+		    r.table(table)
+		    .filter( r.row("updatedDts").gt(from) )
+		    .changes({ includeInitial: true })
+		    .run(db)
+		    .then( function( cursor) {
 
 	            if (cursor) {
 
@@ -108,6 +120,8 @@ cms.prototype.livefeed = function (livefeed_config, callback_to_client) {
 
 	                    	// emit the data back to the client (encode it if there is an app.secret set)
 
+	                    	item.table = cols[i];
+	                    	item.ok	   = true;	
 	                        let encodedData = ( (app.secret) ? crypt.encode(item) : item )
 	                        socket.emit(cfg.topic, item);
 
@@ -118,13 +132,15 @@ cms.prototype.livefeed = function (livefeed_config, callback_to_client) {
 	            
 	            }
 
-	        }
-	    });
+		    });
 
 
-	    socket.on('disconnect', function () {
-	        changeCursors[cursor_id].close();
-	    });
+		    socket.on('disconnect', function () {
+		        changeCursors[cursor_id].close();
+		    });
+
+		} // for each collection
+	
 
 
 	});
@@ -134,45 +150,16 @@ cms.prototype.livefeed = function (livefeed_config, callback_to_client) {
 }
 
 
+Cms.prototype.stopFeed = function() {
 
+	for (var property in changeCursors) {
+	    if (changeCursors.hasOwnProperty(property)) {
 
+	        changeCursors[property].close();
 
-module.exports = cms;
-
-
-/*
-
-exports
-
-var config = {
-
-	express: {
-		port: 3000
+	    }
 	}
 
-};
+}
 
-var express	= require('express');
-
-var auth 	= require('http-auth');
-var basic 	= auth.basic({
-    realm: "Secure Area.",
-    file: __dirname + "/../data/users.htpasswd"
-});
- 
-
-// Application setup. 
-var app = express();
-app.use(auth.connect(basic));
- 
-// Setup route. 
-app.get('/', (req, res) => {
-    res.send(`Hello from express - ${req.user}!`);
-});
-
-app.listen(config.express.port, function() {
-	console.log('Listening on port', config.express.port);
-});
-
-*/
-
+module.exports = Cms;
